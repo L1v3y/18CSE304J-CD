@@ -1,0 +1,56 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Expression Parser</title>
+  <style>
+    input { width: 100%; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<input id="mathExpression" value="1 + 2 * 3" placeholder="Enter a math expression">
+<pre id="output"></pre>
+
+<script>
+function parse(s) {
+  // Create a closure for the two variables needed to iterate the input:
+  const
+    get = ((tokens, match=tokens.next().value) =>
+        // get: return current token when it is of the required group, and move forward,
+        //      else if it was mandatory, throw an error, otherwise return undefined
+        (group, mandatory) => {
+          if (match?.groups[group] !== undefined)
+            return [match?.groups[group], match = tokens.next().value][0];
+          if (mandatory)
+            throw `${s}\n${' '.repeat(match?.index ?? s.length)}^ Expected ${group}`;
+        }
+      )(  // Get iterator that matches tokens with named capture groups.
+        s.matchAll(/(?<number>(?:(?<![\d.)]\s*)-)?\d+(?:\.\d*)?)|(?<open>\()|(?<close>\))|(?<add>\+|(?<unary>-))|(?<mul>[*\/])|(?<end>$)|\S/g)
+      ),
+    // node: Creates a tree node from given operation
+    node = (operation, ...values) => [operation, values],
+    // Grammar rules implementation, using names of regex capture groups, returning nodes
+    factor = (op=get("unary")) =>
+      op ? node(op, factor()) : get("open") ? expr("close") : +get("number", 1),
+    term = (arg=factor(), op=get("mul")) =>
+      op ? term(node(op, arg, factor())) : arg,
+    expr = (end, arg=term(), op=get("add")) =>
+      op ? expr(end, node(op, arg, term())) : (get(end, 1), arg);
+  return expr("end");
+}
+
+  const [input, output] = document.querySelectorAll("#mathExpression, #output");
+
+  input.addEventListener("input", () => {
+    try {
+      output.textContent = JSON.stringify(parse(input.value), null, 2);
+    } catch(err) {
+      output.textContent = err;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+import java.util.Scanner;
+
+public class IntermediateCodeGeneration {
+    // Variable counter for temporary variables
+    static int tempCount = 1;
+
+    // Function to generate a new temporary variable
+    static String newTemp() {
+        return "T" + tempCount++;
+    }
+
+    // Function to generate intermediate code for the expression
+    static void generateIntermediateCode(String input) {
+        String[] tokens = input.split("\\s*\\+\\s*"); // Splitting the input by '+'
+
+        String T = null;
+        for (String token : tokens) {
+            if (token.contains("*")) { // If token contains '*', generate intermediate code for multiplication
+                String[] factors = token.split("\\s*\\*\\s*"); // Splitting the token by '*'
+                String T1 = newTemp();
+                System.out.println(T1 + " = " + factors[0] + " * " + factors[1] + ";");
+                if (T == null) {
+                    T = T1;
+                } else {
+                    String T2 = newTemp();
+                    System.out.println(T2 + " = " + T + " + " + T1 + ";");
+                    T = T2;
+                }
+            } else { // If token does not contain '*', generate intermediate code for addition
+                if (T == null) {
+                    T = token;
+                } else {
+                    String T3 = newTemp();
+                    System.out.println(T3 + " = " + T + " + " + token + ";");
+                    T = T3;
+                }
+            }
+        }
+        System.out.println("Intermediate Code:");
+        System.out.println(T + ";");
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the expression (e.g., a + b * c + d): ");
+        String input = scanner.nextLine();
+
+        // Generate intermediate code for the input expression
+        generateIntermediateCode(input);
+       
+        scanner.close();
+    }
+}

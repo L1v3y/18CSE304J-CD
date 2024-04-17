@@ -1,0 +1,17 @@
+%{
+#include <stdio.h>
+
+%}
+letter [a-zA-Z]
+%%
+[0-9]+ { printf("NUM: %s\n", yytext); }
+{letter}+ { printf("WORD: %s\n", yytext); }
+.|\n ;
+%%
+
+int main() {
+yylex();
+}
+int yywrap() {
+return 1;
+}
