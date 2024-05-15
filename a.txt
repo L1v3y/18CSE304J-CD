@@ -1,0 +1,699 @@
+#week 1
+a=3000
+l=1000
+s=0
+while(a>l):
+    n=(a/l)*2-1
+    x=l//n
+    s=s+x
+    a=a-l
+km_left=a-s
+needed=km_left
+bananas_left=a-needed
+print(bananas_left)
+
+output - 533.0
+
+
+#week 2
+def colour_vertices(graph):
+
+  vertices = sorted((list(graph.keys())))
+  print(vertices)
+  colour_graph = {}
+
+  for vertex in vertices:
+    unused_colours = len(vertices)  [True]             #Checking for unused Colour
+
+    for neighbor in graph[vertex]:                      #gets all the neighbour colour
+      if neighbor in colour_graph:                      #if  already coloured
+        colour = colour_graph[neighbor]                 #updates the flag
+        unused_colours[colour] = False                  #set unused colour to False
+    for colour, unused in enumerate(unused_colours):
+      if unused:
+        colour_graph[vertex] = colour                   # assigning colour value
+        break
+
+  return colour_graph
+
+def chromatic_num(result):
+    count = 0
+    for i, j in result.items():
+        if j > count:
+            count = j
+    return count
+
+graph = {
+    "a": ["c", "d", "b"],
+    "b": ["c", "e", "a"],
+    "c": ["a", "b"],
+    "d": ["a", "e"],
+    "e": ["d", "b"],
+}
+
+result = colour_vertices(graph)
+chromatic_number = chromatic_num(result)
+
+print("Vertex Colors:", result)
+print("Chromatic Number:", chromatic_number+1)
+
+
+output - ['a', 'b', 'c', 'd', 'e']
+Vertex Colors: {'a': 0, 'b': 1, 'c': 2, 'd': 1, 'e': 0}
+Chromatic Number: 3
+
+
+#week 3
+import itertools
+
+def get_value(word, substitution):
+    s = 0
+    factor = 1
+    for letter in reversed(word):
+        s += factor * substitution[letter]
+        factor *= 10
+    return s
+
+def solve2(equation):
+    left, right = equation.lower().replace(' ', '').split('=')
+    left = left.split('+')
+    letters = set(right)
+    for word in left:
+        for letter in word:
+            letters.add(letter)
+    letters = list(letters)
+
+    digits = range(10)
+    for perm in itertools.permutations(digits, len(letters)):
+        sol = dict(zip(letters, perm))
+
+        if sum(get_value(word, sol) for word in left) == get_value(right, sol):
+            print(' + '.join(str(get_value(word, sol)) for word in left) + " = {} (mapping: {})".format(get_value(right, sol), sol))
+
+solve2('EAT + THAT = APPLE')
+
+output - 819 + 9219 = 10038 (mapping: {'h': 2, 'l': 3, 'p': 0, 'e': 8, 'a': 1, 't': 9})
+
+#week 4
+graph = {
+  'A' : ['B','C'],
+  'B' : ['D'],
+  'C' : ['F'],
+  'D' : ['E', 'F'],
+  'E' : [],
+  'F' : ['A']
+}
+
+visited = [] # Keep track of visited nodes.
+queue = []   # Queue
+
+def bfs(visited, graph, node):
+    visited.append(node)
+    queue.append(node)
+    while queue:
+        s = queue.pop(0)
+        print (s, end = " ")
+        for neighbour in graph[s]:
+              if neighbour not in visited:
+                    visited.append(neighbour)
+                    queue.append(neighbour)
+print("BFS:" , end= " ")
+bfs(visited, graph, 'A')
+
+output - BFS: A B C D F E 
+
+graph = {
+  'A' : ['B','C'],
+  'B' : ['D'],
+  'C' : ['F'],
+  'D' : ['E', 'F'],
+  'E' : [],
+  'F' : ['A']
+}
+
+visited = [] # Keep track of visited nodes.
+queue = []   # Queue
+
+def dfs(visited, graph, node):
+    if node not in visited:
+        print (node, end=" ")
+        visited.append(node)
+        for neighbour in graph[node]:
+            dfs(visited, graph, neighbour)
+
+print("DFS:" , end =" ")
+dfs(visited, graph, 'A')
+
+output - DFS: A B D E F C 
+
+
+from queue import PriorityQueue
+
+def best_first_search(graph, start, goal, heuristic):
+    queue = PriorityQueue()
+    queue.put((heuristic[start], [start]))  # Enqueue the start node with its heuristic value and the path
+    visited = set()  # Set to keep track of visited nodes
+
+    while not queue.empty():
+        _, path = queue.get()  # Dequeue the node with the lowest priority
+
+        current = path[-1]  # Get the current node from the path
+
+        if current == goal:
+            return path  # Return the path as the solution
+
+        visited.add(current)  # Mark the current node as visited
+
+        for neighbor in graph[current]:
+            if neighbor not in visited:
+                priority = heuristic[neighbor]  # Calculate the priority (heuristic value)
+                new_path = path + [neighbor]  # Extend the path with the neighbor
+                queue.put((priority, new_path))  # Enqueue the neighbor with its priority and the new path
+
+    return []  # No solution found
+
+# Example graph represented as an adjacency list
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['G'],
+    'F': [],
+    'G': []
+}
+
+# Heuristic values for each node
+heuristic = {
+    'A': 10,
+    'B': 5,
+    'C': 8,
+    'D': 4,
+    'E': 3,
+    'F': 2,
+    'G': 6
+}
+
+start_node = 'A'
+goal_node = 'G'
+
+# Perform Best-First Search
+result = best_first_search(graph, start_node, goal_node, heuristic)
+cost =0
+
+# Print the result
+if result:
+    print("Goal reached!")
+    print("Path:", result)
+
+    for i in result:
+      cost += heuristic[i]
+    print("Cost:",cost)
+
+else:
+    print("No solution found.")
+
+output - Goal reached!
+Path: ['A', 'B', 'E', 'G']
+Cost: 24
+
+
+import heapq
+
+def a_star_search(graph, start, goal):
+    def heuristic(node):
+        return 0
+
+    queue = [(0, start)]  # Open list with the start node
+    visited = set()  # Set to keep track of visited nodes
+    parent = {}  # Dictionary to store the parent node of each visited node
+    g = {node: float('inf') for node in graph}  # Cost from start to each node
+    g[start] = 0
+
+    while queue:
+        _, current = heapq.heappop(queue)  # Pop the node with the lowest f value
+        if current == goal:
+            path = []
+            total_cost = 0  # Initialize total cost to 0
+            while current in parent:
+                path.append(current)
+                total_cost += graph[parent[current]][current]  # Add the cost of the edge to the total cost
+                current = parent[current]
+            path.append(start)
+            path.reverse()
+            return path, total_cost
+
+        visited.add(current)
+
+        for neighbor, cost in graph[current].items():
+            if neighbor in visited:
+                continue
+            neighbor_cost = g[current] + cost
+            if neighbor_cost < g[neighbor]:
+                parent[neighbor] = current
+                g[neighbor] = neighbor_cost
+                f = neighbor_cost + heuristic(neighbor)  # Calculate the heuristic value for the neighbor
+                heapq.heappush(queue, (f, neighbor))
+
+    return [], float('inf')
+
+
+# Example graph represented as an adjacency dictionary
+graph = {
+    'A': {'B': 5, 'C': 10},
+    'B': {'D': 3, 'E': 7},
+    'C': {'F': 8},
+    'D': {},
+    'E': {'G': 3},
+    'F': {},
+    'G': {}
+}
+
+start_node = 'A'
+goal_node = 'G'
+
+# Perform A* search
+result, total_cost = a_star_search(graph, start_node, goal_node)
+
+# Print the result
+if result:
+    print("Goal reached!")
+    print("Path:", result)
+    print("Total cost:", total_cost)
+else:
+    print("No solution found.")
+
+output - Goal reached!
+Path: ['A', 'B', 'E', 'G']
+Total cost: 15
+
+
+#week 6 
+def simple_hill_climbing(numbers):
+
+    current_index = 0
+
+    while True:
+
+        if current_index + 1 < len(numbers): # Check if next index is within the list range
+
+            if numbers[current_index] < numbers[current_index + 1]: # Compare with the next number
+
+                current_index += 1
+
+            else:
+
+                return numbers[current_index] # Current number is greater than the next
+
+        else:
+
+            return numbers[current_index] # End of the list
+
+numbers = [1, 3, 7, 12, 9, 13]
+
+max_number = simple_hill_climbing(numbers)
+
+print(f"The maximum number in the list is: {max_number}")
+
+output - The maximum number in the list is: 13
+
+#week 7
+import math
+
+def minimax (curDepth, nodeIndex,maxTurn, scores,targetDepth):
+
+	if (curDepth == targetDepth): 	# base case : targetDepth reached
+		return scores[nodeIndex]
+
+	if (maxTurn):
+		return max(minimax(curDepth + 1, nodeIndex * 2, False, scores, targetDepth),
+				minimax(curDepth + 1, nodeIndex * 2 + 1, False, scores, targetDepth))
+
+	else:
+		return min(minimax(curDepth + 1, nodeIndex * 2,True, scores, targetDepth),
+				minimax(curDepth + 1, nodeIndex * 2 + 1, True, scores, targetDepth))
+
+
+scores = [3, 5, 2, 9, 12, 5, 23, 23]
+
+treeDepth = math.log(len(scores), 2)
+
+print("The optimal value is : ", end = "")
+print(minimax(0, 0, True, scores, treeDepth))
+
+output - The optimal value is : 12
+
+
+#week 8 
+def get_index_comma(string):
+    index_list = list()
+    par_count = 0
+
+    for i in range(len(string)):
+        if string[i] == ',' and par_count == 0:
+            index_list.append(i)
+        elif string[i] == '(':
+            par_count += 1
+        elif string[i] == ')':
+            par_count -= 1
+
+    return index_list
+
+
+def is_variable(expr):
+    for i in expr:
+        if i == '(' or i == ')':
+            return False
+
+    return True
+
+
+def process_expression(expr):
+    expr = expr.replace(' ', '')
+    index = None
+    for i in range(len(expr)):
+        if expr[i] == '(':
+            index = i
+            break
+    predicate_symbol = expr[:index]
+    expr = expr.replace(predicate_symbol, '')
+    expr = expr[1:len(expr) - 1]
+    arg_list = list()
+    indices = get_index_comma(expr)
+
+    if len(indices) == 0:
+        arg_list.append(expr)
+    else:
+        arg_list.append(expr[:indices[0]])
+        for i, j in zip(indices, indices[1:]):
+            arg_list.append(expr[i + 1:j])
+        arg_list.append(expr[indices[len(indices) - 1] + 1:])
+
+    return predicate_symbol, arg_list
+
+
+def get_arg_list(expr):
+    _, arg_list = process_expression(expr)
+
+    flag = True
+    while flag:
+        flag = False
+
+        for i in arg_list:
+            if not is_variable(i):
+                flag = True
+                _, tmp = process_expression(i)
+                for j in tmp:
+                    if j not in arg_list:
+                        arg_list.append(j)
+                arg_list.remove(i)
+
+    return arg_list
+
+
+def check_occurs(var, expr):
+    arg_list = get_arg_list(expr)
+    if var in arg_list:
+        return True
+
+    return False
+
+
+def unify(expr1, expr2):
+
+    if is_variable(expr1) and is_variable(expr2):
+        if expr1 == expr2:
+            return 'Null'
+        else:
+            return False
+    elif is_variable(expr1) and not is_variable(expr2):
+        if check_occurs(expr1, expr2):
+            return False
+        else:
+            tmp = str(expr2) + '/' + str(expr1)
+            return tmp
+    elif not is_variable(expr1) and is_variable(expr2):
+        if check_occurs(expr2, expr1):
+            return False
+        else:
+            tmp = str(expr1) + '/' + str(expr2)
+            return tmp
+    else:
+        predicate_symbol_1, arg_list_1 = process_expression(expr1)
+        predicate_symbol_2, arg_list_2 = process_expression(expr2)
+
+        # Step 2
+        if predicate_symbol_1 != predicate_symbol_2:
+            return False
+        # Step 3
+        elif len(arg_list_1) != len(arg_list_2):
+            return False
+        else:
+            # Step 4: Create substitution list
+            sub_list = list()
+
+            # Step 5:
+            for i in range(len(arg_list_1)):
+                tmp = unify(arg_list_1[i], arg_list_2[i])
+
+                if not tmp:
+                    return False
+                elif tmp == 'Null':
+                    pass
+                else:
+                    if type(tmp) == list:
+                        for j in tmp:
+                            sub_list.append(j)
+                    else:
+                        sub_list.append(tmp)
+
+            # Step 6
+            return sub_list
+
+
+if __name__ == '__main__':
+
+    f1 = 'Q(a, g(x, a), f(y))'
+    f2 = 'Q(a, g(f(b), a), x)'
+    # f1 = input('f1 : ')
+    # f2 = input('f2 : ')
+
+    result = unify(f1, f2)
+
+    if not result:
+        print('Failed!')
+    else:
+        print('Successful!')
+        print(result)
+
+output - Successful!
+['f(b)/x', 'f(y)/x']
+
+
+def negate_literal(literal):
+    """
+    Negates a given literal
+    """
+    if literal[0] == '~':
+        return literal[1:]
+    else:
+        return '~' + literal
+
+def resolve(clause1, clause2):
+    """
+    Resolves two clauses and returns the resolved clause
+    """
+    resolved_clause = []
+    for literal in clause1:
+        if negate_literal(literal) not in clause2:
+            resolved_clause.append(literal)
+    for literal in clause2:
+        if negate_literal(literal) not in clause1:
+            resolved_clause.append(literal)
+    return resolved_clause
+
+def resolution(clauses):
+    """
+    Performs resolution on a set of clauses
+    """
+    new_clauses = set(map(tuple, clauses))  # Initial set of clauses
+    while True:
+        new_clause_set = set()  # Set to store new clauses
+        for clause1 in new_clauses:
+            for clause2 in new_clauses:
+                if clause1 != clause2:
+                    resolvents = resolve(clause1, clause2)  # Resolve clause1 and clause2
+                    if () in resolvents:  # Empty clause (contradiction) found
+                        return True  # Satisfiable
+                    new_clause_set.update(resolvents)  # Add new clauses to the set
+        if new_clause_set.issubset(new_clauses):  # No new clauses were added
+            return False  # Unsatisfiable
+        new_clauses.update(map(tuple, new_clause_set))  # Add new clauses to the set of clauses
+
+# Given formula in clausal form
+clauses = [['~P', '~Q', 'R']]
+
+# Apply resolution algorithm
+result = resolution(clauses)
+
+# Print the result
+if result:
+    print("The formula is satisfiable (contains a contradiction).")
+else:
+    print("The formula is unsatisfiable (no contradiction found).")
+
+output - The formula is unsatisfiable (no contradiction found).
+
+
+#week 9 
+import random
+
+def run_trial(switch_doors, ndoors=3):
+    chosen_door = random.randint(1, ndoors)
+    if switch_doors:
+
+        revealed_door = 3 if chosen_door==2 else 2
+
+        available_doors = [dnum for dnum in range(1,ndoors+1)
+                                if dnum not in (chosen_door, revealed_door)]
+        chosen_door = random.choice(available_doors)
+
+    return chosen_door == 1
+
+def run_trials(ntrials, switch_doors, ndoors=3):
+    nwins = 0
+    for i in range(ntrials):
+        if run_trial(switch_doors, ndoors):
+            nwins += 1
+    return nwins
+
+ndoors, ntrials = 3, 10000
+nwins_without_switch = run_trials(ntrials, False, ndoors)
+nwins_with_switch = run_trials(ntrials, True, ndoors)
+
+print('Monty Hall Problem with {} doors'.format(ndoors))
+print('Proportion of wins without switching: {:.4f}'.format(nwins_without_switch/ntrials))
+print('Proportion of wins with switching: {:.4f}'.format(nwins_with_switch/ntrials))
+
+output -
+Monty Hall Problem with 3 doors
+Proportion of wins without switching: 0.3378
+Proportion of wins with switching: 0.6670
+
+#week 10 
+import argparse
+import operator
+
+def combination(d1, d2):
+    united = set(d1.keys()).union(set(d2.keys()))
+    result = dict.fromkeys(united, 0)
+
+    ## Combination
+    for i in d1.keys():
+        for j in d2.keys():
+            if {''} == i and {''} == j:
+                result[i] += d1[i] * d2[j]
+            else:
+                if {''} == i:
+                    result[j] += d1[i] * d2[j]
+                if {''} == j:
+                    result[i] += d1[i] * d2[j]
+                if {''} != i and {''} != j:
+                    common = frozenset(i.intersection(j))
+                    for k in result.keys():
+                        if len(common) != 0 and common == k:
+                            result[k] += d1[i] * d2[j]
+                            break
+    ## Normalization
+    for i in result.keys():
+        result[i] = round(result[i], 4)
+
+    f = sum(list(result.values()))
+    f = round(f, 4)
+
+    for i in result.keys():
+        result[i] = round(result[i] / f, 4)
+
+    return result
+
+def transformset(input):
+    return dict((frozenset(elem[0]), elem[1]) for elem in input)
+
+def get_mass(allLines):
+    mass = {}
+    previousLine = {}
+    currentLine = {}
+    previousLine = transformset(allLines[0])
+
+    for line in range(1, len(allLines)):
+        currentLine = transformset(allLines[line])
+        mass = combination(previousLine, currentLine)
+        previousLine = mass
+    return mass.copy()
+
+def get_beliefs(masses):
+    belief = masses.copy()
+    for i in belief.keys():
+        for j in belief.keys():
+            if i != j:
+                if i.issuperset(j) and {''} != i and {''} != j:
+                    belief[i] += masses[j]
+    for i in belief.keys():
+        belief[i] = round(belief[i], 4)
+    return belief
+
+def get_plausibility(masses):
+    plausibility = masses.copy()
+
+    for i in plausibility.keys():
+        plausibility[i] = 0
+    for i in plausibility.keys():
+        for j in plausibility.keys():
+            if len(i.intersection(j)) != 0 and {''} != i:
+                plausibility[i] += masses[j]
+            if {''} == j:
+                plausibility[i] += masses[j]
+
+    for i in plausibility.keys():
+        plausibility[i] = round(plausibility[i], 4)
+    return plausibility
+
+def filter_results(beliefs, plausibility):
+    finalSet = {}
+    for elem in beliefs.keys():
+        finalSet[elem] = beliefs[elem]
+    return finalSet
+
+def get_final_result(elements, plausibility):
+    resultString = ''
+    for elem in elements:
+        setOfElems = elem[0]
+        movieTypes = str(setOfElems)
+        if elem[0] != {''}:
+            resultString += movieTypes[11:-2] + ' [' + str(elem[1]) + ', ' + str(plausibility[elem[0]]) + ']\n'
+    return resultString
+
+# Parse input
+input_data = [
+    [[{'western'}, 0.65], [{'horror'}, 0.25]],
+    [[{'western','comedy'}, 0.85], [{'horror'}, 0.15]],
+    [[{'western'}, 0.87], [{'horror'}, 0.13]]
+]
+
+mass = {}
+mass = get_mass(input_data)
+beliefs = get_beliefs(mass)
+plausibility = get_plausibility(mass)
+final_set = filter_results(beliefs, plausibility)
+all_elements = sorted(final_set.items(), key=operator.itemgetter(1), reverse=True)
+
+print("Intervals")
+print(get_final_result(all_elements, plausibility))
+
+output - 
+Intervals
+'western', 'comedy' [0.9899, 0.9899]
+'western' [0.9899, 0.9899]
+'horror' [0.0101, 0.0101]
+
+
